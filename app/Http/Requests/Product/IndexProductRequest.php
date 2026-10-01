@@ -19,6 +19,7 @@ class IndexProductRequest extends FormRequest
             'max_price' => ['sometimes', 'numeric', 'min:0', 'gte:min_price'],
             'stock_level' => ['sometimes', 'in:out,low,in_stock'],
             'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
+            'page' => ['sometimes', 'integer', 'min:1'],
         ];
     }
 }

@@ -89,6 +89,17 @@ class ProductApiTest extends TestCase
         $this->getJson('/api/products')->assertOk()->assertJsonPath('meta.total', 2);
     }
 
+    public function test_api_routes_are_rate_limited(): void
+    {
+        $this->actingAs(User::factory()->create(), 'sanctum');
+
+        for ($request = 0; $request < 60; $request++) {
+            $this->getJson('/api/products')->assertOk();
+        }
+
+        $this->getJson('/api/products')->assertTooManyRequests();
+    }
+
     public function test_authenticated_user_can_view_and_update_product(): void
     {
         $this->actingAs(User::factory()->create(), 'sanctum');

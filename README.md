@@ -50,6 +50,7 @@ All product endpoints require authentication.
 | GET | `/api/products/{id}` | Show a product |
 | PUT/PATCH | `/api/products/{id}` | Update a product |
 | DELETE | `/api/products/{id}` | Soft-delete a product |
+| POST | `/api/products/{id}/restore` | Restore a soft-deleted product |
 
 List filters can be combined: `category_id`, `min_price`, `max_price`, `stock_level` (`out`, `low`, or `in_stock`), and `per_page` (1-100). Example: `/api/products?category_id=1&min_price=10&max_price=50&stock_level=low&per_page=20`.
 

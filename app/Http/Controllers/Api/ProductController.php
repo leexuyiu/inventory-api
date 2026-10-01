@@ -66,4 +66,12 @@ class ProductController extends Controller
 
         return response()->noContent();
     }
+
+    public function restore(string $id): ProductResource
+    {
+        $product = Product::withTrashed()->findOrFail($id);
+        $product->restore();
+
+        return new ProductResource($product->load(['category', 'suppliers']));
+    }
 }

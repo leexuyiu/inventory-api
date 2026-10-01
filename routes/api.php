@@ -14,5 +14,6 @@ Route::prefix('auth')->group(function () {
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', fn (Request $request) => $request->user());
+    Route::post('/products/{id}/restore', [ProductController::class, 'restore']);
     Route::apiResource('products', ProductController::class);
 });

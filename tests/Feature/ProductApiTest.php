@@ -96,6 +96,23 @@ class ProductApiTest extends TestCase
         $this->getJson('/api/products/'.$product->id)->assertNotFound();
     }
 
+    public function test_authenticated_user_can_restore_a_soft_deleted_product(): void
+    {
+        $this->actingAs(User::factory()->create(), 'sanctum');
+        $product = Product::factory()->create();
+        $product->delete();
+
+        $this->postJson('/api/products/'.$product->id.'/restore')
+            ->assertOk()
+            ->assertJsonPath('data.id', $product->id);
+
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'deleted_at' => null,
+        ]);
+        $this->getJson('/api/products')->assertOk()->assertJsonCount(1, 'data');
+    }
+
     public function test_registration_login_and_logout_issue_and_revoke_tokens(): void
     {
         $this->postJson('/api/auth/register', [

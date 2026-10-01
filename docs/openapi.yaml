@@ -1,0 +1,333 @@
+openapi: 3.0.3
+info:
+  title: Product Inventory API
+  version: 1.0.0
+  description: Sanctum-authenticated inventory API for products, categories, and suppliers. API routes are limited to 60 requests per minute; product list results are cached for one minute.
+servers:
+  - url: http://localhost:8000/api
+    description: Local development server
+tags:
+  - name: Authentication
+  - name: Products
+paths:
+  /auth/register:
+    post:
+      tags: [Authentication]
+      summary: Register a user and issue a bearer token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password, password_confirmation]
+              properties:
+                name: { type: string, maxLength: 255 }
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8, format: password }
+                password_confirmation: { type: string, format: password }
+      responses:
+        '201':
+          description: User and token created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TokenResponse' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+  /auth/login:
+    post:
+      tags: [Authentication]
+      summary: Sign in and issue a bearer token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, format: password }
+      responses:
+        '200':
+          description: User and token returned
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TokenResponse' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+  /auth/logout:
+    post:
+      tags: [Authentication]
+      summary: Revoke the current bearer token
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: Token revoked }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+  /user:
+    get:
+      tags: [Authentication]
+      summary: Retrieve the authenticated user
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Authenticated user returned
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+  /products:
+    get:
+      tags: [Products]
+      summary: List products with optional filters and pagination
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: query
+          name: category_id
+          schema: { type: integer, minimum: 1 }
+        - in: query
+          name: min_price
+          schema: { type: number, minimum: 0 }
+        - in: query
+          name: max_price
+          schema: { type: number, minimum: 0 }
+        - in: query
+          name: stock_level
+          schema: { type: string, enum: [out, low, in_stock] }
+        - in: query
+          name: per_page
+          schema: { type: integer, minimum: 1, maximum: 100, default: 15 }
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 1, default: 1 }
+      responses:
+        '200':
+          description: Paginated product list
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProductPage' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+    post:
+      tags: [Products]
+      summary: Create a product
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProductInput' }
+      responses:
+        '201':
+          description: Product created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProductResponse' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+  /products/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema: { type: integer, minimum: 1 }
+    get:
+      tags: [Products]
+      summary: Retrieve a product
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Product returned
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProductResponse' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+    put:
+      tags: [Products]
+      summary: Update product fields
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProductUpdate' }
+      responses:
+        '200':
+          description: Product updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProductResponse' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+    patch:
+      tags: [Products]
+      summary: Partially update a product
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProductUpdate' }
+      responses:
+        '200':
+          description: Product updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProductResponse' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+    delete:
+      tags: [Products]
+      summary: Soft-delete a product
+      security: [{ bearerAuth: [] }]
+      responses:
+        '204': { description: Product soft-deleted }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+  /products/{id}/restore:
+    post:
+      tags: [Products]
+      summary: Restore a soft-deleted product
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          description: Product restored
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProductResponse' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Sanctum token
+  schemas:
+    User:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        email: { type: string, format: email }
+    TokenResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            user: { $ref: '#/components/schemas/User' }
+            token: { type: string }
+    Category:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        slug: { type: string }
+    Supplier:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        email: { type: string, format: email, nullable: true }
+        phone: { type: string, nullable: true }
+    Product:
+      type: object
+      properties:
+        id: { type: integer }
+        sku: { type: string }
+        name: { type: string }
+        description: { type: string, nullable: true }
+        price: { type: string, example: '12.50' }
+        stock_quantity: { type: integer }
+        reorder_level: { type: integer }
+        stock_status: { type: string, enum: [out_of_stock, low_stock, in_stock] }
+        is_active: { type: boolean }
+        category: { $ref: '#/components/schemas/Category' }
+        suppliers:
+          type: array
+          items: { $ref: '#/components/schemas/Supplier' }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    ProductResponse:
+      type: object
+      properties:
+        data: { $ref: '#/components/schemas/Product' }
+    ProductPage:
+      type: object
+      properties:
+        data:
+          type: array
+          items: { $ref: '#/components/schemas/Product' }
+        links: { type: object, additionalProperties: true }
+        meta: { type: object, additionalProperties: true }
+    ProductInput:
+      type: object
+      required: [category_id, sku, name, price, stock_quantity]
+      properties:
+        category_id: { type: integer }
+        sku: { type: string, maxLength: 64 }
+        name: { type: string, maxLength: 255 }
+        description: { type: string, nullable: true }
+        price: { type: number, minimum: 0 }
+        stock_quantity: { type: integer, minimum: 0 }
+        reorder_level: { type: integer, minimum: 0 }
+        is_active: { type: boolean }
+        supplier_ids:
+          type: array
+          items: { type: integer }
+    ProductUpdate:
+      type: object
+      description: All fields are optional for updates.
+      properties:
+        category_id: { type: integer }
+        sku: { type: string, maxLength: 64 }
+        name: { type: string, maxLength: 255 }
+        description: { type: string, nullable: true }
+        price: { type: number, minimum: 0 }
+        stock_quantity: { type: integer, minimum: 0 }
+        reorder_level: { type: integer, minimum: 0 }
+        is_active: { type: boolean }
+        supplier_ids:
+          type: array
+          items: { type: integer }
+    ErrorResponse:
+      type: object
+      properties:
+        message: { type: string }
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items: { type: string }
+  responses:
+    Unauthorized:
+      description: Missing or invalid bearer token
+    NotFound:
+      description: Product not found
+    ValidationError:
+      description: Validation failed
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    TooManyRequests:
+      description: Rate limit exceeded; retry after the indicated interval

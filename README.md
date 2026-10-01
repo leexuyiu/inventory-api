@@ -58,6 +58,10 @@ All API routes are limited to 60 requests per minute per authenticated user or c
 
 Create/update payloads accept `category_id`, `sku`, `name`, `description`, `price`, `stock_quantity`, `reorder_level`, `is_active`, and `supplier_ids` (an array of existing supplier IDs). Product responses are formatted with API Resources and include category, suppliers, and computed `stock_status`.
 
+## API documentation
+
+The OpenAPI 3.0 specification is in [`docs/openapi.yaml`](docs/openapi.yaml). Import it into Swagger UI or another OpenAPI-compatible client to explore the API.
+
 ## GitHub submission
 
 Create an empty GitHub repository, then from this directory run:

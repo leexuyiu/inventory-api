@@ -70,6 +70,36 @@ class ProductApiTest extends TestCase
             ->assertJsonPath('data.0.stock_status', 'low_stock');
     }
 
+    public function test_product_index_cache_is_invalidated_after_creation(): void
+    {
+        $this->actingAs(User::factory()->create(), 'sanctum');
+        $category = Category::factory()->create();
+        Product::factory()->create(['category_id' => $category->id]);
+
+        $this->getJson('/api/products')->assertOk()->assertJsonPath('meta.total', 1);
+
+        $this->postJson('/api/products', [
+            'category_id' => $category->id,
+            'sku' => 'CACHE-INVALIDATION-001',
+            'name' => 'New product',
+            'price' => 10,
+            'stock_quantity' => 10,
+        ])->assertCreated();
+
+        $this->getJson('/api/products')->assertOk()->assertJsonPath('meta.total', 2);
+    }
+
+    public function test_api_routes_are_rate_limited(): void
+    {
+        $this->actingAs(User::factory()->create(), 'sanctum');
+
+        for ($request = 0; $request < 60; $request++) {
+            $this->getJson('/api/products')->assertOk();
+        }
+
+        $this->getJson('/api/products')->assertTooManyRequests();
+    }
+
     public function test_authenticated_user_can_view_and_update_product(): void
     {
         $this->actingAs(User::factory()->create(), 'sanctum');

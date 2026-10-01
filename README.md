@@ -50,10 +50,17 @@ All product endpoints require authentication.
 | GET | `/api/products/{id}` | Show a product |
 | PUT/PATCH | `/api/products/{id}` | Update a product |
 | DELETE | `/api/products/{id}` | Soft-delete a product |
+| POST | `/api/products/{id}/restore` | Restore a soft-deleted product |
 
 List filters can be combined: `category_id`, `min_price`, `max_price`, `stock_level` (`out`, `low`, or `in_stock`), and `per_page` (1-100). Example: `/api/products?category_id=1&min_price=10&max_price=50&stock_level=low&per_page=20`.
 
+All API routes are limited to 60 requests per minute per authenticated user or client IP. Product list responses are cached for one minute; create, update, delete, and restore operations invalidate cached listings.
+
 Create/update payloads accept `category_id`, `sku`, `name`, `description`, `price`, `stock_quantity`, `reorder_level`, `is_active`, and `supplier_ids` (an array of existing supplier IDs). Product responses are formatted with API Resources and include category, suppliers, and computed `stock_status`.
+
+## API documentation
+
+The OpenAPI 3.0 specification is in [`docs/openapi.yaml`](docs/openapi.yaml). Import it into Swagger UI or another OpenAPI-compatible client to explore the API.
 
 ## GitHub submission
 

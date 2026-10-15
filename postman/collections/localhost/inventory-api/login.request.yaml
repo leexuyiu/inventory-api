@@ -1,0 +1,27 @@
+$kind: http-request
+url: "{{baseUrl}}/api/auth/login"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"email\": \"test@example.com\",\r
+
+    \  \"password\": \"password\"\r
+
+    }"
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: "const body = pm.response.json();\r
+
+      \r
+
+      if (body.data?.token) {\r
+
+      \  pm.environment.set(\"token\", body.data.token);\r
+
+      }"
+    language: text/javascript
+order: 1000

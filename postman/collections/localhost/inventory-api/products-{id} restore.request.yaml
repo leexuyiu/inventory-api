@@ -1,0 +1,10 @@
+$kind: http-request
+name: products/{id} restore
+url: "{{baseUrl}}/api/products/1/restore"
+method: POST
+headers:
+  Accept: " application/json"
+body:
+  type: json
+  content: ""
+order: 7000

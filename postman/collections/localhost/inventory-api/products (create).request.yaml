@@ -1,0 +1,29 @@
+$kind: http-request
+url: "{{baseUrl}}/api/products"
+method: POST
+headers:
+  Accept: " application/json"
+body:
+  type: json
+  content: "{\r
+
+    \  \"category_id\": 1,\r
+
+    \  \"sku\": \"WIDGET-001\",\r
+
+    \  \"name\": \"Widget\",\r
+
+    \  \"description\": \"A sample product\",\r
+
+    \  \"price\": 12.5,\r
+
+    \  \"stock_quantity\": 20,\r
+
+    \  \"reorder_level\": 5,\r
+
+    \  \"is_active\": true,\r
+
+    \  \"supplier_ids\": [1]\r
+
+    }"
+order: 4000

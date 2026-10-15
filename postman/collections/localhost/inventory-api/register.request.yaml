@@ -1,0 +1,29 @@
+$kind: http-request
+url: "{{baseUrl}}/api/auth/register"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"name\": \"Postman User\",\r
+
+    \  \"email\": \"you@example.com\",\r
+
+    \  \"password\": \"password\",\r
+
+    \  \"password_confirmation\": \"password\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "const body = pm.response.json();\r
+
+      \r
+
+      if (body.data?.token) {\r
+
+      \  pm.environment.set(\"token\", body.data.token);\r
+
+      }"
+    language: text/javascript
+order: 2000

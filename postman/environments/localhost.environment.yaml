@@ -1,0 +1,6 @@
+name: localhost
+values:
+  - key: baseUrl
+    value: ''
+  - key: token
+    value: ''

@@ -1,0 +1,14 @@
+workspace:
+  id: 88c3ccd2-57f2-425c-8fd7-2d45ddc03626
+localResources:
+  specs:
+    - ../docs/openapi.yaml
+cloudResources:
+  collections:
+    ../postman/collections/localhost: 17263374-9cc2ff85-0812-4a5b-a7ab-c30b1b6e4413
+  environments:
+    ../postman/environments/localhost.environment.yaml: 17263374-cb90997b-f068-4c12-9dce-c60a25944cbc
+  globals:
+    ../postman/globals/workspace.globals.yaml: 35a1d078-4ed4-45a4-82ef-b2311e13f27b
+  documents:
+    ../postman/documents/WORKSPACE-README.md: afdf2741-4432-4b79-8e17-b466536156ad

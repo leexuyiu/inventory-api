@@ -1,0 +1,14 @@
+name: Globals
+values:
+  - key: ford_url
+    value: http://ford-getaways.test/api
+    enabled: true
+  - key: accessToken
+    value: ""
+    enabled: true
+  - key: refreshToken
+    value: ""
+    enabled: true
+  - key: memberId
+    value: ""
+    enabled: true

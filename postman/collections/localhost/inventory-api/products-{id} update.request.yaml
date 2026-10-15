@@ -1,0 +1,18 @@
+$kind: http-request
+name: products/{id} update
+url: "{{baseUrl}}/api/products/1"
+method: PATCH
+headers:
+  Accept: " application/json"
+body:
+  type: json
+  content: "{\r
+
+    \  \"name\": \"Updated Widget\",\r
+
+    \  \"price\": 14.99,\r
+
+    \  \"stock_quantity\": 18\r
+
+    }"
+order: 8000
